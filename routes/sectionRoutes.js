@@ -1,13 +1,14 @@
 const express = require("express");
-const { verifyAdmin } = require("../middleware/auth");
 const sectionController = require("../controllers/sectionController");
-
+const autherizationRoles = require("../middleware/autherization");
+const verificationToken = require("../middleware/authentication");
 const router = express.Router();
-
-router.post("/", verifyAdmin, sectionController.createSection);
-router.get("/", verifyAdmin, sectionController.getAllSections);
-router.get("/:id", verifyAdmin, sectionController.getSectionById);
-router.put("/:id", verifyAdmin, sectionController.updateSection);
-router.delete("/:id", verifyAdmin, sectionController.deleteSection);
+router.use(verificationToken);
+router.use(autherizationRoles("admin"))
+router.post("/", sectionController.createSection);
+router.get("/",  sectionController.getAllSections);
+router.get("/:id", sectionController.getSectionById);
+router.put("/:id", sectionController.updateSection);
+router.delete("/:id", sectionController.deleteSection);
 
 module.exports = router;

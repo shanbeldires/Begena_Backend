@@ -18,8 +18,11 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 app.use(morgan("dev"));
-
-const PORT = process.env.PORT || 5000;
+app.use((req, res, next) => {
+  console.log("Incoming body:", req.body);
+  next();
+});
+const PORT = process.env.PORT || PORT;
 
 // Routes middleware
 app.use("/api/auth", authRoutes);

@@ -1,13 +1,13 @@
 const express = require("express");
-const { verifyAdmin } = require("../middleware/auth");
-const studentController = require("../controllers/studentController");
-
+const studentController = require("../controllers/studentController.js");
+const autherizationRoles = require("../middleware/autherization.js");
+const verificationToken = require("../middleware/authentication.js");
 const router = express.Router();
-
-router.post("/", verifyAdmin, studentController.createStudent);
+router.use(verificationToken);
+router.post("/", autherizationRoles("admin"), studentController.createStudent);
 router.get("/", studentController.getAllStudents);
 router.get("/:id", studentController.getStudentById);
-router.put("/:id", verifyAdmin, studentController.updateStudent);
-router.delete("/:id", verifyAdmin, studentController.deleteStudent);
+router.put("/:id", autherizationRoles("admin"), studentController.updateStudent);
+router.delete("/:id", autherizationRoles("admin"), studentController.deleteStudent);
 
 module.exports = router;

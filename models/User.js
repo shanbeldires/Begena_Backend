@@ -1,16 +1,53 @@
 const mongoose = require("mongoose");
-const bcrypt = require("bcryptjs");
 
-const userSchema = new mongoose.Schema({
-  fullName: { type: String, required: true },
-  role: { type: String, enum: ["user", "admin"], default: "user" },
-  password: { type: String } 
-});
-
-userSchema.pre("save", async function(next) {
-  if (!this.isModified("password")) return next();
-  this.password = await bcrypt.hash(this.password, 10);
-  next();
-});
-
-module.exports = mongoose.model("User", userSchema);
+const userSchema = new mongoose.Schema(
+  {
+    full_name: {
+      type: String,
+      required: [true, "full name is required"],
+      minlength: [3, "name at least 3 characters"],
+      trim: true
+    },
+    email: {
+      type: String,
+      required: [true, "email is required"],
+      unique: true,
+      lowercase: true,
+      trim: true,
+      match: [/\S+@\S+\.\S+/, "Invalid email"]
+    },
+    password: {
+      type: String,
+      required: [true, "password is required"],
+      minlength: [8, "password at least 8 characters"]
+    },
+    phone: {
+      type: String,
+      required: [true, "phone number is required"],
+    },
+    address: {
+      type: String,
+      required: [true, "address is required"],
+      trim: true
+    },
+    role: {
+      type: String,
+      enum: ["user", "admin"],
+      dafault: "user",
+      trim: true,
+    },
+    worngAttempts: {
+      type: Number,
+      default: 0
+    },
+    lockUntil: {
+      type: Date,
+      default: Date.now()
+    }
+  },
+  {
+    timestamps: true
+  }
+);
+const User = mongoose.model("User", userSchema);
+module.exports = User;
