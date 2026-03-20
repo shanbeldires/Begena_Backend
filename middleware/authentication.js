@@ -5,7 +5,7 @@ const ACCESS_TOKEN_PUBLIC_KEY = require("../config/env.js");
 
 const verificationToken = async(req,res,next)=>{
    try{
-        const token = req.cookies?.accessToken || token;
+        const token = req.cookies?.accessToken || req.headers["authorization"]?.split(" ")[1];
         if(!token){
             const error = new Error("token missing");
             error.statusCode = 401;

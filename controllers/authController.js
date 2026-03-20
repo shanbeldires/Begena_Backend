@@ -23,7 +23,7 @@ const cookieOption = {
 
 const signUp = async (req, res, next) => {
   try {
-    const { full_name, email, password, phone, address} = req.body;
+    const { full_name, email, password, phone, address,role} = req.body;
     const { error } = userValidation.validate(req.body);
 
     if (error) {
@@ -57,7 +57,7 @@ const signUp = async (req, res, next) => {
       email,
       phone,
       address,
-      role:User.role || "user",
+      role:role || "user",
       password: hashedPassword
     });
 
@@ -90,14 +90,13 @@ const signUp = async (req, res, next) => {
     let expires_at = new Date();
     expires_at.setDate(expires_at.getDate() + 90);
 
-    await RefreshToken.create({
-      user_id: newUser._id,
-      refreshToken: hashedRefreshToken,
-      expires_at,
-      upsert: true ,
-      new: true 
-    });
-
+    await RefreshToken.findOneAndUpdate(
+      {user_id: newUser._id},
+      {refreshToken: hashedRefreshToken,expires_at},
+      {upsert: true ,
+      new: true }
+    );
+    
     const userObject = newUser.toObject();
     delete userObject.password;
 
@@ -195,13 +194,12 @@ const signIn = async (req, res, next) => {
     let expires_at = new Date();
     expires_at.setDate(expires_at.getDate() + 90);
 
-    await RefreshToken.create({
-      user_id: user._id,
-      refreshToken: hashedRefreshToken,
-      expires_at, 
-      upsert: true, 
-      new: true 
-    });
+    await RefreshToken.findOneAndUpdate(
+      {user_id: user._id},
+      {refreshToken: hashedRefreshToken,expires_at},
+      {upsert: true, 
+      new: true }
+    );
 
     const userObject = user.toObject();
     delete userObject.password;
